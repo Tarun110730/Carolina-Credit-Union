@@ -208,15 +208,18 @@
                 // Store original people list
                 originalPeople = [...people];
                 
-                // Filter out people with "Reachout Sent" status
-                people = people.filter(person => {
+                // Create filtered list instead of reassigning people
+                const availablePeople = people.filter(person => {
                     return !person['Status'] || person['Status'].trim() === '';
                 });
+                
+                // Update the global people array reference
+                window.availablePeople = availablePeople;
                 
                 updateDropdown();
                 updateSyncStatus();
                 
-                console.log('Filtered data loaded:', people.length, 'available people');
+                console.log('Filtered data loaded:', availablePeople.length, 'available people');
             } catch (error) {
                 console.error('Error in loadFilteredData:', error);
                 alert('Error loading data: ' + error.message);
@@ -232,8 +235,11 @@
                 
                 select.innerHTML = '<option value="">Choose a person...</option>';
                 
-                if (Array.isArray(people)) {
-                    people.forEach(person => {
+                // Use the filtered available people
+                const availablePeople = window.availablePeople || people;
+                
+                if (Array.isArray(availablePeople)) {
+                    availablePeople.forEach(person => {
                         const option = document.createElement('option');
                         option.value = person['Full Name'];
                         option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
@@ -241,7 +247,7 @@
                     });
                 }
                 
-                console.log('Dropdown updated with', people.length, 'people');
+                console.log('Dropdown updated with', availablePeople.length, 'people');
             } catch (error) {
                 console.error('Error in updateDropdown:', error);
                 alert('Error updating dropdown: ' + error.message);
@@ -256,12 +262,13 @@
                 }
                 
                 const totalPeople = originalPeople.length;
-                const availablePeople = people.length;
-                const deletedCount = totalPeople - availablePeople;
+                const availablePeople = window.availablePeople || people;
+                const availableCount = availablePeople.length;
+                const deletedCount = totalPeople - availableCount;
                 
-                statusElement.textContent = `Available: ${availablePeople} people, ${deletedCount} marked as "Reachout Sent"`;
+                statusElement.textContent = `Available: ${availableCount} people, ${deletedCount} marked as "Reachout Sent"`;
                 
-                console.log('Status updated:', availablePeople, 'available,', deletedCount, 'deleted');
+                console.log('Status updated:', availableCount, 'available,', deletedCount, 'deleted');
             } catch (error) {
                 console.error('Error in updateSyncStatus:', error);
                 alert('Error updating status: ' + error.message);
@@ -276,7 +283,8 @@
             }
             
             if (confirm(`Are you sure you want to mark ${selectedName} as "Reachout Sent"?`)) {
-                const personToDelete = people.find(p => p['Full Name'] === selectedName);
+                const availablePeople = window.availablePeople || people;
+                const personToDelete = availablePeople.find(p => p['Full Name'] === selectedName);
                 if (personToDelete) {
                     // Mark as "Reachout Sent" in the original data
                     const originalPerson = originalPeople.find(p => p['Full Name'] === selectedName);
@@ -284,9 +292,9 @@
                         originalPerson['Status'] = 'Reachout Sent';
                     }
                     
-                    // Remove from current people array
-                    const index = people.findIndex(p => p['Full Name'] === selectedName);
-                    people.splice(index, 1);
+                    // Remove from available people array
+                    const index = availablePeople.findIndex(p => p['Full Name'] === selectedName);
+                    availablePeople.splice(index, 1);
                     
                     // Add to deleted people array for undo
                     deletedPeople.push(personToDelete);
@@ -313,8 +321,9 @@
                 originalPerson['Status'] = '';
             }
             
-            // Add back to people array
-            people.push(personToRestore);
+            // Add back to available people array
+            const availablePeople = window.availablePeople || people;
+            availablePeople.push(personToRestore);
             
             updateDropdown();
             updateSyncStatus();
@@ -336,7 +345,8 @@
                 return;
             }
 
-            const person = people.find(p => p['Full Name'] === selectedName);
+            const availablePeople = window.availablePeople || people;
+            const person = availablePeople.find(p => p['Full Name'] === selectedName);
             if (!person) {
                 alert('Person not found.');
                 return;
