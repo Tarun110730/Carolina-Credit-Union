@@ -5,7 +5,13 @@ Handles CSV updates and Git operations for the web-based editor
 """
 
 from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
+try:
+    from flask_cors import CORS
+except ImportError:
+    print("Warning: flask_cors not found. Installing...")
+    import subprocess
+    subprocess.check_call(["pip", "install", "flask-cors"])
+    from flask_cors import CORS
 import csv
 import json
 import subprocess
