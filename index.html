@@ -349,10 +349,11 @@
             <div class="search-section">
                 <h2>⚡ Bulk Actions</h2>
                 <p>Quick actions for managing multiple people at once.</p>
-                <div class="action-buttons">
-                    <button onclick="exportCSV()" class="btn-success">Export Current Data</button>
-                    <button onclick="resetAllStatus()" class="btn-danger">Reset All Status</button>
-                </div>
+                                 <div class="action-buttons">
+                     <button onclick="exportCSV()" class="btn-success">Export Current Data</button>
+                     <button onclick="resetAllStatus()" class="btn-danger">Reset All Status</button>
+                     <button onclick="pushToGitHub()" class="btn-warning">🚀 Push to GitHub</button>
+                 </div>
             </div>
         </div>
     </div>
@@ -788,18 +789,22 @@ Carolina Credit Union Initiative`;
             }
         });
 
-        function markContacted(name) {
-            const person = allPeople.find(p => p['Full Name'] === name);
-            if (person) {
-                person['Status'] = 'Reachout Sent';
-                updateAdminStats();
-                // Only refresh if the person is on the current page
-                if (filteredPeople.some(p => p['Full Name'] === name)) {
-                    displayAdminPeople();
-                }
-                alert(`✅ Marked ${name} as contacted`);
-            }
-        }
+                 function markContacted(name) {
+             const person = allPeople.find(p => p['Full Name'] === name);
+             if (person) {
+                 person['Status'] = 'Reachout Sent';
+                 updateAdminStats();
+                 // Only refresh if the person is on the current page
+                 if (filteredPeople.some(p => p['Full Name'] === name)) {
+                     displayAdminPeople();
+                 }
+                 
+                 // Show push to GitHub option
+                 if (confirm(`✅ Marked ${name} as contacted\n\nWould you like to push this change to GitHub now?`)) {
+                     pushToGitHub();
+                 }
+             }
+         }
 
         function markAvailable(name) {
             const person = allPeople.find(p => p['Full Name'] === name);
@@ -849,6 +854,60 @@ Carolina Credit Union Initiative`;
                      displayAdminPeople();
                      alert('✅ Reset all statuses');
                  }, 10);
+             }
+         }
+
+         async function pushToGitHub() {
+             try {
+                 // Show loading message
+                 alert('🔄 Preparing to push changes to GitHub...\n\nThis will update the CSV and push to GitHub automatically.');
+                 
+                 // Check if API server is available
+                 const response = await fetch('/api/update_csv', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ people: allPeople })
+                 });
+                 
+                 if (response.ok) {
+                     // Try to sync to GitHub
+                     const syncResponse = await fetch('/api/sync_to_github', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' }
+                     });
+                     
+                     if (syncResponse.ok) {
+                         const result = await syncResponse.json();
+                         if (result.success) {
+                             alert('✅ Successfully pushed changes to GitHub!\n\nThe CSV has been updated and synced to your repository.');
+                         } else {
+                             throw new Error(result.error || 'GitHub sync failed');
+                         }
+                     } else {
+                         throw new Error('Failed to sync to GitHub');
+                     }
+                 } else {
+                     throw new Error('Failed to update CSV');
+                 }
+             } catch (error) {
+                 console.error('Push to GitHub error:', error);
+                 
+                 // Fallback: Download the updated CSV
+                 alert('⚠️ API server not available. Downloading updated CSV file instead.\n\nPlease manually update your CSV file and push to GitHub.');
+                 
+                 let csvContent = 'Class Year,Employer,Employer City,Employer State,Employer Country,Type,Job Title,Full Name,Post-Graduation Email Address,Google Search Query,Reachout Notes,Status\n';
+                 
+                 allPeople.forEach(person => {
+                     csvContent += `2013,${person['Employer']},City,State,USA,Full-Time,${person['Job Title']},${person['Full Name']},email@example.com,${person['Google Search Query']},,${person['Status'] || ''}\n`;
+                 });
+
+                 const blob = new Blob([csvContent], { type: 'text/csv' });
+                 const url = window.URL.createObjectURL(blob);
+                 const a = document.createElement('a');
+                 a.href = url;
+                 a.download = 'Email Project with Data for Alumni Database - Job & Internship Acceptances (1).csv';
+                 a.click();
+                 window.URL.revokeObjectURL(url);
              }
          }
     </script>
