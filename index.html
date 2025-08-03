@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cold Email Prompt Generator</title>
+    <title>Cold Email Prompt Generator (CSV Synced)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,11 +66,27 @@
             border-radius: 5px;
             margin-bottom: 15px;
         }
+        .sync-status {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .csv-update-info {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Cold Email Prompt Generator</h1>
+        <h1>Cold Email Prompt Generator (CSV Synced)</h1>
         
         <!-- Step 1: User Info Form -->
         <div id="user-form">
@@ -94,6 +110,11 @@
         <div id="person-selection" class="hidden">
             <h2>Step 2: Select Person</h2>
             <div class="person-info" id="user-info-display"></div>
+            <div class="sync-status" id="sync-status">Loading data...</div>
+            <div class="csv-update-info" id="csv-update-info">
+                <strong>Note:</strong> When you delete someone, their status will be marked as "Reachout Sent" in the CSV. 
+                You'll need to commit and push the updated CSV to GitHub for others to see the changes.
+            </div>
             
             <div class="form-group">
                 <label for="personSelect">Select Person:</label>
@@ -125,7 +146,8 @@
     <script src='people_data.js'></script>
     <script>
         let currentUser = {};
-        let deletedPeople = []; // Track deleted people for undo functionality
+        let deletedPeople = [];
+        let originalPeople = [];
 
         function nextStep() {
             const name = document.getElementById('yourName').value.trim();
@@ -143,7 +165,31 @@
                 yourCollegeinUNC: college
             };
 
-            // Populate person dropdown
+            // Load data and filter out people with "Reachout Sent" status
+            loadFilteredData();
+
+            // Show user info
+            document.getElementById('user-info-display').textContent = 
+                `User: ${name}, ${year}, ${college || 'UNC Chapel Hill'}`;
+
+            document.getElementById('user-form').classList.add('hidden');
+            document.getElementById('person-selection').classList.remove('hidden');
+        }
+
+        function loadFilteredData() {
+            // Store original people list
+            originalPeople = [...people];
+            
+            // Filter out people with "Reachout Sent" status
+            people = people.filter(person => {
+                return !person['Status'] || person['Status'].trim() === '';
+            });
+            
+            updateDropdown();
+            updateSyncStatus();
+        }
+
+        function updateDropdown() {
             const select = document.getElementById('personSelect');
             select.innerHTML = '<option value="">Choose a person...</option>';
             people.forEach(person => {
@@ -152,13 +198,69 @@
                 option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
                 select.appendChild(option);
             });
+        }
 
-            // Show user info
-            document.getElementById('user-info-display').textContent = 
-                `User: ${name}, ${year}, ${college || 'UNC Chapel Hill'}`;
+        function updateSyncStatus() {
+            const statusElement = document.getElementById('sync-status');
+            const totalPeople = originalPeople.length;
+            const availablePeople = people.length;
+            const deletedCount = totalPeople - availablePeople;
+            
+            statusElement.textContent = `Available: ${availablePeople} people, ${deletedCount} marked as "Reachout Sent"`;
+        }
 
-            document.getElementById('user-form').classList.add('hidden');
-            document.getElementById('person-selection').classList.remove('hidden');
+        function deleteSelectedPerson() {
+            const selectedName = document.getElementById('personSelect').value;
+            if (!selectedName) {
+                alert('Please select a person to delete.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to mark ${selectedName} as "Reachout Sent"?`)) {
+                const personToDelete = people.find(p => p['Full Name'] === selectedName);
+                if (personToDelete) {
+                    // Mark as "Reachout Sent" in the original data
+                    const originalPerson = originalPeople.find(p => p['Full Name'] === selectedName);
+                    if (originalPerson) {
+                        originalPerson['Status'] = 'Reachout Sent';
+                    }
+                    
+                    // Remove from current people array
+                    const index = people.findIndex(p => p['Full Name'] === selectedName);
+                    people.splice(index, 1);
+                    
+                    // Add to deleted people array for undo
+                    deletedPeople.push(personToDelete);
+                    
+                    updateDropdown();
+                    updateSyncStatus();
+                    
+                    alert(`${selectedName} has been marked as "Reachout Sent". Remember to commit and push the updated CSV to GitHub!`);
+                }
+            }
+        }
+
+        function undoLastDelete() {
+            if (deletedPeople.length === 0) {
+                alert('No deleted people to restore.');
+                return;
+            }
+            
+            const personToRestore = deletedPeople.pop();
+            
+            // Clear status in original data
+            const originalPerson = originalPeople.find(p => p['Full Name'] === personToRestore['Full Name']);
+            if (originalPerson) {
+                originalPerson['Status'] = '';
+            }
+            
+            // Add back to people array
+            people.push(personToRestore);
+            
+            updateDropdown();
+            updateSyncStatus();
+            
+            alert(`${personToRestore['Full Name']} has been restored. Remember to commit and push the updated CSV to GitHub!`);
         }
 
         function backToStep1() {
@@ -228,74 +330,12 @@ Carolina Credit Union Initiative`;
             });
         }
 
-        function deleteSelectedPerson() {
-            const selectedName = document.getElementById('personSelect').value;
-            if (!selectedName) {
-                alert('Please select a person to delete.');
-                return;
-            }
-            
-            if (confirm(`Are you sure you want to delete ${selectedName} from the list?`)) {
-                // Find the person to delete
-                const personToDelete = people.find(p => p['Full Name'] === selectedName);
-                if (personToDelete) {
-                    // Remove from people array
-                    const index = people.findIndex(p => p['Full Name'] === selectedName);
-                    people.splice(index, 1);
-                    
-                    // Add to deleted people array for undo functionality
-                    deletedPeople.push(personToDelete);
-                    
-                    // Refresh the dropdown
-                    const select = document.getElementById('personSelect');
-                    select.innerHTML = '<option value="">Choose a person...</option>';
-                    people.forEach(person => {
-                        const option = document.createElement('option');
-                        option.value = person['Full Name'];
-                        option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
-                        select.appendChild(option);
-                    });
-                    
-                    alert(`${selectedName} has been deleted from the list. You can undo this action.`);
-                }
-            }
-        }
-
-        function undoLastDelete() {
-            if (deletedPeople.length === 0) {
-                alert('No deleted people to restore.');
-                return;
-            }
-            
-            // Get the last deleted person
-            const personToRestore = deletedPeople.pop();
-            
-            // Add back to people array
-            people.push(personToRestore);
-            
-            // Refresh the dropdown
-            const select = document.getElementById('personSelect');
-            select.innerHTML = '<option value="">Choose a person...</option>';
-            people.forEach(person => {
-                const option = document.createElement('option');
-                option.value = person['Full Name'];
-                option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
-                select.appendChild(option);
-            });
-            
-            alert(`${personToRestore['Full Name']} has been restored to the list.`);
-        }
-
         function startOver() {
-            // Go back to person selection (keep user config)
             document.getElementById('person-selection').classList.remove('hidden');
             document.getElementById('prompt-output').classList.add('hidden');
             
-            // Clear only the person selection and notes
             document.getElementById('personSelect').value = '';
             document.getElementById('googleNotes').value = '';
-            
-            // Keep currentUser intact so user info is preserved
         }
     </script>
 </body>

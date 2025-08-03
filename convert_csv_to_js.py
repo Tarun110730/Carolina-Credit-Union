@@ -3,7 +3,7 @@ import json
 import os
 
 def convert_csv_to_js():
-    csv_path = 'Email Project with Data for Alumni Database - Job & Internship Acceptances.csv'
+    csv_path = 'Email Project with Data for Alumni Database - Job & Internship Acceptances (1).csv'
     
     people = []
     with open(csv_path, newline='', encoding='utf-8') as csvfile:
@@ -15,7 +15,8 @@ def convert_csv_to_js():
                     'Full Name': row['Full Name'],
                     'Job Title': row['Job Title'],
                     'Employer': row['Employer'],
-                    'Google Search Query': row['Google Search Query']
+                    'Google Search Query': row['Google Search Query'],
+                    'Status': row.get('Status', '')  # Include Status column
                 })
     
     # Create JavaScript array
@@ -30,6 +31,7 @@ def convert_csv_to_js():
     print("\nTo use this in your HTML file:")
     print("1. Replace the people array in index.html with the contents of people_data.js")
     print("2. Or add: <script src='people_data.js'></script> to your HTML")
+    print("\nNote: The Status column is now included for tracking 'Reachout Sent' entries")
 
 if __name__ == '__main__':
     convert_csv_to_js() 
