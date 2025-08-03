@@ -1,0 +1,36 @@
+name: Auto Sync CSV Changes
+
+on:
+  push:
+    paths:
+      - 'Email Project with Data for Alumni Database - Job & Internship Acceptances (1).csv'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  sync-csv:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        pip install pandas
+        
+    - name: Convert CSV to JavaScript
+      run: |
+        python convert_csv_to_js.py
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add people_data.js
+        git commit -m "Auto-sync: Updated people_data.js from CSV changes" || echo "No changes to commit"
+        git push 

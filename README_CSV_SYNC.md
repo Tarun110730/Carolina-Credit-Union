@@ -36,22 +36,35 @@ When someone is "deleted" (marked as contacted):
 
 ## 🔄 **Workflow:**
 
-### **For Users:**
+### **Option 1: Auto-Sync (Recommended)**
 1. Open the app
 2. Select a person to contact
 3. Click "Delete Selected Person" (marks as "Reachout Sent")
 4. Generate and send the email
-5. **Remember to update the CSV and push to GitHub!**
+5. **Run auto-sync script:**
+   ```bash
+   python auto_sync.py
+   ```
+6. Choose option 1 to mark the person and push to GitHub
 
-### **For CSV Updates:**
-```python
-# Mark someone as contacted
-python update_csv_status.py
-# Then edit the script to call: update_csv_status("Full Name")
+### **Option 2: Manual Sync**
+1. Use the app as above
+2. Run the sync script:
+   ```bash
+   python sync_deletions.py
+   ```
+3. Manually commit and push:
+   ```bash
+   git add .
+   git commit -m "Updated CSV status"
+   git push
+   ```
 
-# Or manually edit the CSV file
-# Find the person's row and set Status = "Reachout Sent"
-```
+### **Option 3: GitHub Actions (Automatic)**
+- The `.github/workflows/auto-sync-csv.yml` will automatically:
+  - Convert CSV to JavaScript when CSV changes
+  - Update `people_data.js` automatically
+  - Commit and push changes
 
 ## ✅ **Benefits:**
 
