@@ -101,6 +101,7 @@
                     <option value="">Choose a person...</option>
                 </select>
                 <button type="button" onclick="deleteSelectedPerson()" style="background-color: #dc3545; margin-top: 10px;">Delete Selected Person</button>
+                <button type="button" onclick="undoLastDelete()" style="background-color: #28a745; margin-top: 10px; margin-left: 10px;">Undo Last Delete</button>
             </div>
             
             <div class="form-group">
@@ -124,6 +125,7 @@
     <script src='people_data.js'></script>
     <script>
         let currentUser = {};
+        let deletedPeople = []; // Track deleted people for undo functionality
 
         function nextStep() {
             const name = document.getElementById('yourName').value.trim();
@@ -234,10 +236,15 @@ Carolina Credit Union Initiative`;
             }
             
             if (confirm(`Are you sure you want to delete ${selectedName} from the list?`)) {
-                // Remove from people array
-                const index = people.findIndex(p => p['Full Name'] === selectedName);
-                if (index > -1) {
+                // Find the person to delete
+                const personToDelete = people.find(p => p['Full Name'] === selectedName);
+                if (personToDelete) {
+                    // Remove from people array
+                    const index = people.findIndex(p => p['Full Name'] === selectedName);
                     people.splice(index, 1);
+                    
+                    // Add to deleted people array for undo functionality
+                    deletedPeople.push(personToDelete);
                     
                     // Refresh the dropdown
                     const select = document.getElementById('personSelect');
@@ -249,9 +256,34 @@ Carolina Credit Union Initiative`;
                         select.appendChild(option);
                     });
                     
-                    alert(`${selectedName} has been deleted from the list.`);
+                    alert(`${selectedName} has been deleted from the list. You can undo this action.`);
                 }
             }
+        }
+
+        function undoLastDelete() {
+            if (deletedPeople.length === 0) {
+                alert('No deleted people to restore.');
+                return;
+            }
+            
+            // Get the last deleted person
+            const personToRestore = deletedPeople.pop();
+            
+            // Add back to people array
+            people.push(personToRestore);
+            
+            // Refresh the dropdown
+            const select = document.getElementById('personSelect');
+            select.innerHTML = '<option value="">Choose a person...</option>';
+            people.forEach(person => {
+                const option = document.createElement('option');
+                option.value = person['Full Name'];
+                option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
+                select.appendChild(option);
+            });
+            
+            alert(`${personToRestore['Full Name']} has been restored to the list.`);
         }
 
         function startOver() {
