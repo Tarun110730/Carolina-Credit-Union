@@ -100,6 +100,7 @@
                 <select id="personSelect" required>
                     <option value="">Choose a person...</option>
                 </select>
+                <button type="button" onclick="deleteSelectedPerson()" style="background-color: #dc3545; margin-top: 10px;">Delete Selected Person</button>
             </div>
             
             <div class="form-group">
@@ -189,7 +190,7 @@
 
             const prompt = `Please help me generate a personalized cold email for ${person['Full Name']} based on the following information:
 
-${notesSection}
+Google Search URL: ${person['Google Search Query']}${notesSection}
 
 Using this information and any additional context you can provide, generate a personalized cold email using the following template (fill in the brackets with the appropriate information):
 
@@ -225,18 +226,44 @@ Carolina Credit Union Initiative`;
             });
         }
 
+        function deleteSelectedPerson() {
+            const selectedName = document.getElementById('personSelect').value;
+            if (!selectedName) {
+                alert('Please select a person to delete.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete ${selectedName} from the list?`)) {
+                // Remove from people array
+                const index = people.findIndex(p => p['Full Name'] === selectedName);
+                if (index > -1) {
+                    people.splice(index, 1);
+                    
+                    // Refresh the dropdown
+                    const select = document.getElementById('personSelect');
+                    select.innerHTML = '<option value="">Choose a person...</option>';
+                    people.forEach(person => {
+                        const option = document.createElement('option');
+                        option.value = person['Full Name'];
+                        option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
+                        select.appendChild(option);
+                    });
+                    
+                    alert(`${selectedName} has been deleted from the list.`);
+                }
+            }
+        }
+
         function startOver() {
-            document.getElementById('user-form').classList.remove('hidden');
-            document.getElementById('person-selection').classList.add('hidden');
+            // Go back to person selection (keep user config)
+            document.getElementById('person-selection').classList.remove('hidden');
             document.getElementById('prompt-output').classList.add('hidden');
             
-            // Clear forms
-            document.getElementById('yourName').value = '';
-            document.getElementById('yourYear').value = '';
-            document.getElementById('yourCollege').value = '';
+            // Clear only the person selection and notes
+            document.getElementById('personSelect').value = '';
             document.getElementById('googleNotes').value = '';
             
-            currentUser = {};
+            // Keep currentUser intact so user info is preserved
         }
     </script>
 </body>
