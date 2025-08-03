@@ -346,7 +346,6 @@
     <script>
         let currentUser = {};
         let deletedPeople = [];
-        let originalPeople = [];
         let allPeople = [];
         let filteredPeople = [];
         let currentFilter = 'all';
@@ -364,9 +363,9 @@
                 console.error('people data not loaded');
                 alert('Error: People data not loaded. Please check if people_data.js exists.');
             } else {
-                console.log('People data loaded successfully:', people.length, 'people');
                 allPeople = people;
                 filteredPeople = [...allPeople];
+                console.log('People data loaded successfully:', allPeople.length, 'people');
                 updateAdminStats();
                 displayAdminPeople();
             }
@@ -406,18 +405,8 @@
 
         function loadFilteredData() {
             try {
-                // Check if people data exists
-                if (typeof people === 'undefined' || !Array.isArray(people)) {
-                    throw new Error('People data not available');
-                }
-                
-                // Store original people list
-                originalPeople = [...people];
-                
-                // Create filtered list instead of reassigning people
-                const availablePeople = people.filter(person => {
-                    return !person['Status'] || person['Status'].trim() === '';
-                });
+                // Create filtered list for email generator
+                const availablePeople = allPeople.filter(isPersonAvailable);
                 
                 // Update the global people array reference
                 window.availablePeople = availablePeople;
@@ -442,16 +431,14 @@
                 select.innerHTML = '<option value="">Choose a person...</option>';
                 
                 // Use the filtered available people
-                const availablePeople = window.availablePeople || people;
+                const availablePeople = window.availablePeople || [];
                 
-                if (Array.isArray(availablePeople)) {
-                    availablePeople.forEach(person => {
-                        const option = document.createElement('option');
-                        option.value = person['Full Name'];
-                        option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
-                        select.appendChild(option);
-                    });
-                }
+                availablePeople.forEach(person => {
+                    const option = document.createElement('option');
+                    option.value = person['Full Name'];
+                    option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
+                    select.appendChild(option);
+                });
                 
                 console.log('Dropdown updated with', availablePeople.length, 'people');
             } catch (error) {
@@ -467,14 +454,14 @@
                     throw new Error('Status element not found');
                 }
                 
-                const totalPeople = originalPeople.length;
-                const availablePeople = window.availablePeople || people;
+                const totalPeople = allPeople.length;
+                const availablePeople = window.availablePeople || [];
                 const availableCount = availablePeople.length;
-                const deletedCount = totalPeople - availableCount;
+                const contactedCount = totalPeople - availableCount;
                 
-                statusElement.textContent = `Available: ${availableCount} people, ${deletedCount} marked as "Reachout Sent"`;
+                statusElement.textContent = `Available: ${availableCount} people, ${contactedCount} marked as "Reachout Sent"`;
                 
-                console.log('Status updated:', availableCount, 'available,', deletedCount, 'deleted');
+                console.log('Status updated:', availableCount, 'available,', contactedCount, 'contacted');
             } catch (error) {
                 console.error('Error in updateSyncStatus:', error);
                 alert('Error updating status: ' + error.message);
@@ -489,24 +476,16 @@
             }
             
             if (confirm(`Are you sure you want to mark ${selectedName} as "Reachout Sent"?`)) {
-                const availablePeople = window.availablePeople || people;
-                const personToDelete = availablePeople.find(p => p['Full Name'] === selectedName);
+                const personToDelete = allPeople.find(p => p['Full Name'] === selectedName);
                 if (personToDelete) {
-                    // Mark as "Reachout Sent" in the original data
-                    const originalPerson = originalPeople.find(p => p['Full Name'] === selectedName);
-                    if (originalPerson) {
-                        originalPerson['Status'] = 'Reachout Sent';
-                    }
-                    
-                    // Remove from available people array
-                    const index = availablePeople.findIndex(p => p['Full Name'] === selectedName);
-                    availablePeople.splice(index, 1);
+                    // Mark as "Reachout Sent"
+                    personToDelete['Status'] = 'Reachout Sent';
                     
                     // Add to deleted people array for undo
                     deletedPeople.push(personToDelete);
                     
-                    updateDropdown();
-                    updateSyncStatus();
+                    // Reload filtered data
+                    loadFilteredData();
                     
                     alert(`${selectedName} has been marked as "Reachout Sent". Remember to commit and push the updated CSV to GitHub!`);
                 }
@@ -521,18 +500,14 @@
             
             const personToRestore = deletedPeople.pop();
             
-            // Clear status in original data
-            const originalPerson = originalPeople.find(p => p['Full Name'] === personToRestore['Full Name']);
-            if (originalPerson) {
-                originalPerson['Status'] = '';
+            // Clear status in the main data
+            const person = allPeople.find(p => p['Full Name'] === personToRestore['Full Name']);
+            if (person) {
+                person['Status'] = '';
             }
             
-            // Add back to available people array
-            const availablePeople = window.availablePeople || people;
-            availablePeople.push(personToRestore);
-            
-            updateDropdown();
-            updateSyncStatus();
+            // Reload filtered data
+            loadFilteredData();
             
             alert(`${personToRestore['Full Name']} has been restored. Remember to commit and push the updated CSV to GitHub!`);
         }
@@ -551,8 +526,7 @@
                 return;
             }
 
-            const availablePeople = window.availablePeople || people;
-            const person = availablePeople.find(p => p['Full Name'] === selectedName);
+            const person = allPeople.find(p => p['Full Name'] === selectedName);
             if (!person) {
                 alert('Person not found.');
                 return;
@@ -632,10 +606,20 @@ Carolina Credit Union Initiative`;
             event.target.classList.add('active');
         }
 
+        // Helper function to check if person is available
+        function isPersonAvailable(person) {
+            return !person['Status'] || person['Status'].trim() === '';
+        }
+
+        // Helper function to check if person is contacted
+        function isPersonContacted(person) {
+            return person['Status'] && person['Status'].trim() === 'Reachout Sent';
+        }
+
         // Admin Panel Functions
         function updateAdminStats() {
             const total = allPeople.length;
-            const available = allPeople.filter(p => !p['Status'] || p['Status'].trim() === '').length;
+            const available = allPeople.filter(isPersonAvailable).length;
             const contacted = total - available;
 
             document.getElementById('total-people').textContent = total;
@@ -649,7 +633,7 @@ Carolina Credit Union Initiative`;
             container.innerHTML = '';
 
             filteredPeople.forEach(person => {
-                const isContacted = person['Status'] && person['Status'].trim() === 'Reachout Sent';
+                const isContacted = isPersonContacted(person);
                 const statusClass = isContacted ? 'status-contacted' : 'status-available';
                 const statusText = isContacted ? 'Contacted' : 'Available';
 
@@ -682,10 +666,10 @@ Carolina Credit Union Initiative`;
             // Filter people
             switch(filter) {
                 case 'available':
-                    filteredPeople = allPeople.filter(p => !p['Status'] || p['Status'].trim() === '');
+                    filteredPeople = allPeople.filter(isPersonAvailable);
                     break;
                 case 'contacted':
-                    filteredPeople = allPeople.filter(p => p['Status'] && p['Status'].trim() === 'Reachout Sent');
+                    filteredPeople = allPeople.filter(isPersonContacted);
                     break;
                 default:
                     filteredPeople = [...allPeople];
@@ -703,9 +687,9 @@ Carolina Credit Union Initiative`;
                     
                     let searchResults = allPeople;
                     if (currentFilter === 'available') {
-                        searchResults = allPeople.filter(p => !p['Status'] || p['Status'].trim() === '');
+                        searchResults = allPeople.filter(isPersonAvailable);
                     } else if (currentFilter === 'contacted') {
-                        searchResults = allPeople.filter(p => p['Status'] && p['Status'].trim() === 'Reachout Sent');
+                        searchResults = allPeople.filter(isPersonContacted);
                     }
 
                     filteredPeople = searchResults.filter(person => 
