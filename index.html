@@ -149,64 +149,123 @@
         let deletedPeople = [];
         let originalPeople = [];
 
-        function nextStep() {
-            const name = document.getElementById('yourName').value.trim();
-            const year = document.getElementById('yourYear').value.trim().toLowerCase();
-            const college = document.getElementById('yourCollege').value.trim();
+        // Add error handling and debugging
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('JavaScript Error:', msg, 'at', url, 'line', lineNo);
+            alert('JavaScript Error: ' + msg + '\nCheck console for details.');
+            return false;
+        };
 
-            if (!name || !year) {
-                alert('Please fill in your name and year.');
-                return;
+        // Check if people data is loaded
+        window.addEventListener('load', function() {
+            if (typeof people === 'undefined') {
+                console.error('people data not loaded');
+                alert('Error: People data not loaded. Please check if people_data.js exists.');
+            } else {
+                console.log('People data loaded successfully:', people.length, 'people');
             }
+        });
 
-            currentUser = {
-                yourName: name,
-                yourYear: year,
-                yourCollegeinUNC: college
-            };
+        function nextStep() {
+            try {
+                const name = document.getElementById('yourName').value.trim();
+                const year = document.getElementById('yourYear').value.trim().toLowerCase();
+                const college = document.getElementById('yourCollege').value.trim();
 
-            // Load data and filter out people with "Reachout Sent" status
-            loadFilteredData();
+                if (!name || !year) {
+                    alert('Please fill in your name and year.');
+                    return;
+                }
 
-            // Show user info
-            document.getElementById('user-info-display').textContent = 
-                `User: ${name}, ${year}, ${college || 'UNC Chapel Hill'}`;
+                currentUser = {
+                    yourName: name,
+                    yourYear: year,
+                    yourCollegeinUNC: college
+                };
 
-            document.getElementById('user-form').classList.add('hidden');
-            document.getElementById('person-selection').classList.remove('hidden');
+                // Load data and filter out people with "Reachout Sent" status
+                loadFilteredData();
+
+                // Show user info
+                document.getElementById('user-info-display').textContent = 
+                    `User: ${name}, ${year}, ${college || 'UNC Chapel Hill'}`;
+
+                document.getElementById('user-form').classList.add('hidden');
+                document.getElementById('person-selection').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error in nextStep:', error);
+                alert('Error: ' + error.message);
+            }
         }
 
         function loadFilteredData() {
-            // Store original people list
-            originalPeople = [...people];
-            
-            // Filter out people with "Reachout Sent" status
-            people = people.filter(person => {
-                return !person['Status'] || person['Status'].trim() === '';
-            });
-            
-            updateDropdown();
-            updateSyncStatus();
+            try {
+                // Check if people data exists
+                if (typeof people === 'undefined' || !Array.isArray(people)) {
+                    throw new Error('People data not available');
+                }
+                
+                // Store original people list
+                originalPeople = [...people];
+                
+                // Filter out people with "Reachout Sent" status
+                people = people.filter(person => {
+                    return !person['Status'] || person['Status'].trim() === '';
+                });
+                
+                updateDropdown();
+                updateSyncStatus();
+                
+                console.log('Filtered data loaded:', people.length, 'available people');
+            } catch (error) {
+                console.error('Error in loadFilteredData:', error);
+                alert('Error loading data: ' + error.message);
+            }
         }
 
         function updateDropdown() {
-            const select = document.getElementById('personSelect');
-            select.innerHTML = '<option value="">Choose a person...</option>';
-            people.forEach(person => {
-                const option = document.createElement('option');
-                option.value = person['Full Name'];
-                option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
-                select.appendChild(option);
-            });
+            try {
+                const select = document.getElementById('personSelect');
+                if (!select) {
+                    throw new Error('Person select element not found');
+                }
+                
+                select.innerHTML = '<option value="">Choose a person...</option>';
+                
+                if (Array.isArray(people)) {
+                    people.forEach(person => {
+                        const option = document.createElement('option');
+                        option.value = person['Full Name'];
+                        option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
+                        select.appendChild(option);
+                    });
+                }
+                
+                console.log('Dropdown updated with', people.length, 'people');
+            } catch (error) {
+                console.error('Error in updateDropdown:', error);
+                alert('Error updating dropdown: ' + error.message);
+            }
         }
 
         function updateSyncStatus() {
-            const statusElement = document.getElementById('sync-status');
-            const totalPeople = originalPeople.length;
-            const availablePeople = people.length;
-            const deletedCount = totalPeople - availablePeople;
-            
-            statusElement.textContent = `Available: ${availablePeople} people, ${deletedCount} marked as "Reachout Sent"`;
+            try {
+                const statusElement = document.getElementById('sync-status');
+                if (!statusElement) {
+                    throw new Error('Status element not found');
+                }
+                
+                const totalPeople = originalPeople.length;
+                const availablePeople = people.length;
+                const deletedCount = totalPeople - availablePeople;
+                
+                statusElement.textContent = `Available: ${availablePeople} people, ${deletedCount} marked as "Reachout Sent"`;
+                
+                console.log('Status updated:', availablePeople, 'available,', deletedCount, 'deleted');
+            } catch (error) {
+                console.error('Error in updateSyncStatus:', error);
+                alert('Error updating status: ' + error.message);
+            }
         }
 
         function deleteSelectedPerson() {
