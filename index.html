@@ -506,7 +506,10 @@
                     // Reload filtered data
                     loadFilteredData();
                     
-                    alert(`${selectedName} has been marked as "Reachout Sent". Remember to commit and push the updated CSV to GitHub!`);
+                    // Show push to GitHub option
+                    if (confirm(`✅ Marked ${selectedName} as contacted\n\nWould you like to push this change to GitHub now?`)) {
+                        pushToGitHub();
+                    }
                 }
             }
         }
