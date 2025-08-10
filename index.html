@@ -74,214 +74,68 @@
             margin-bottom: 15px;
             font-size: 14px;
         }
-        .csv-update-info {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 10px;
+        .google-query-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
             border-radius: 5px;
-            margin-bottom: 15px;
-            font-size: 14px;
+            padding: 15px;
+            margin-top: 5px;
         }
-        
-        /* Tab Styles */
-        .tab-navigation {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .tab-button {
-            background-color: #6c757d;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .tab-button.active {
-            background-color: #007bff;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        
-        /* Admin Panel Styles */
-        .admin-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-        .stat-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            border-left: 4px solid #007bff;
-        }
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
+        .google-link {
             color: #007bff;
+            text-decoration: none;
+            word-break: break-all;
+            display: inline-block;
+            max-width: 100%;
         }
-        .search-section {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        .search-box {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-        .person-list {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: white;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-        .person-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .person-item:last-child {
-            border-bottom: none;
-        }
-        .person-info {
-            flex: 1;
-        }
-        .person-name {
-            font-weight: bold;
-        }
-        .person-details {
-            color: #666;
-            font-size: 0.9em;
-        }
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-        .status-available {
-            background: #d4edda;
-            color: #155724;
-        }
-        .status-contacted {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-        }
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-        .btn-success {
-            background-color: #28a745;
-        }
-                 .btn-success:hover {
-             background-color: #218838;
-         }
-         .btn-warning {
-             background-color: #ffc107;
-             color: #212529;
-         }
-         .btn-warning:hover {
-             background-color: #e0a800;
-         }
-        .filter-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .filter-tab {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            background: white;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .filter-tab.active {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
+        .google-link:hover {
+            text-decoration: underline;
+            color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Tab Navigation -->
-        <div class="tab-navigation">
-            <button class="tab-button active" onclick="switchTab('email-generator')">📧 Email Generator</button>
-            <button class="tab-button" onclick="switchTab('admin-panel')">📊 Admin Panel</button>
-        </div>
+        <h1>Cold Email Prompt Generator (CSV Synced)</h1>
         
-        <!-- Email Generator Tab -->
-        <div id="email-generator" class="tab-content active">
-            <h1>Cold Email Prompt Generator (CSV Synced)</h1>
-            
-            <!-- Step 1: User Info Form -->
-            <div id="user-form">
-            <h2>Step 1: Enter Your Info</h2>
-            <div class="form-group">
-                <label for="yourName">Your Full Name:</label>
-                <input type="text" id="yourName" required>
-            </div>
-            <div class="form-group">
-                <label for="yourYear">Your Year:</label>
-                <input type="text" id="yourYear" required placeholder="e.g., senior, junior, sophomore, freshman">
-            </div>
-            <div class="form-group">
-                <label for="yourCollege">Your College in UNC (optional):</label>
-                <input type="text" id="yourCollege" placeholder="e.g., Kenan-Flagler Business School">
-            </div>
-            <button onclick="nextStep()">Continue</button>
+        <!-- Step 1: User Info Form -->
+        <div id="user-form">
+        <h2>Step 1: Enter Your Info</h2>
+        <div class="form-group">
+            <label for="yourName">Your Full Name:</label>
+            <input type="text" id="yourName" required>
         </div>
+        <div class="form-group">
+            <label for="yourYear">Your Year:</label>
+            <input type="text" id="yourYear" required placeholder="e.g., senior, junior, sophomore, freshman">
+        </div>
+        <div class="form-group">
+            <label for="yourCollege">Your College in UNC (optional):</label>
+            <input type="text" id="yourCollege" placeholder="e.g., Kenan-Flagler Business School">
+        </div>
+        <button onclick="nextStep()">Continue</button>
+    </div>
 
         <!-- Step 2: Person Selection -->
         <div id="person-selection" class="hidden">
             <h2>Step 2: Select Person</h2>
             <div class="person-info" id="user-info-display"></div>
             <div class="sync-status" id="sync-status">Loading data...</div>
-            <div class="csv-update-info" id="csv-update-info">
-                <strong>Note:</strong> When you delete someone, their status will be marked as "Reachout Sent" in the CSV. 
-                You'll need to commit and push the updated CSV to GitHub for others to see the changes.
-            </div>
             
             <div class="form-group">
                 <label for="personSelect">Select Person:</label>
-                <select id="personSelect" required>
+                <select id="personSelect" required onchange="showPersonDetails()">
                     <option value="">Choose a person...</option>
                 </select>
-                <button type="button" onclick="deleteSelectedPerson()" style="background-color: #dc3545; margin-top: 10px;">Delete Selected Person</button>
-                <button type="button" onclick="undoLastDelete()" style="background-color: #28a745; margin-top: 10px; margin-left: 10px;">Undo Last Delete</button>
+            </div>
+            
+            <div id="person-details" class="hidden">
+                <div class="form-group">
+                    <label>Google Search Query:</label>
+                    <div class="google-query-display">
+                        <a id="google-query-link" href="" target="_blank" class="google-link">Click here to open Google search</a>
+                    </div>
+                </div>
             </div>
             
             <div class="form-group">
@@ -300,74 +154,13 @@
             <button onclick="copyPrompt()">Copy to Clipboard</button>
             <button onclick="startOver()" style="background-color: #6c757d;">Start Over</button>
         </div>
-        </div>
         
-        <!-- Admin Panel Tab -->
-        <div id="admin-panel" class="tab-content">
-            <h1>📊 Admin Panel - CSV Management</h1>
-            
-            <!-- Statistics -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="total-people">-</div>
-                    <div>Total People</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="available-people">-</div>
-                    <div>Available</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="contacted-people">-</div>
-                    <div>Contacted</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="sync-status">-</div>
-                    <div>Last Sync</div>
-                </div>
-            </div>
-
-            <!-- Search and Filter -->
-            <div class="search-section">
-                <h2>👥 People Management</h2>
-                <input type="text" class="search-box" id="admin-search-box" placeholder="Search by name, job title, or employer...">
-                
-                <div class="filter-tabs">
-                    <div class="filter-tab active" onclick="filterPeople('all')">All People</div>
-                    <div class="filter-tab" onclick="filterPeople('available')">Available</div>
-                    <div class="filter-tab" onclick="filterPeople('contacted')">Contacted</div>
-                </div>
-
-                <div class="person-list" id="admin-person-list">
-                    <!-- People will be loaded here -->
-                </div>
-                <div id="admin-pagination" style="text-align: center; margin-top: 15px;">
-                    <!-- Pagination will be added here -->
-                </div>
-            </div>
-
-            <!-- Bulk Actions -->
-            <div class="search-section">
-                <h2>⚡ Bulk Actions</h2>
-                <p>Quick actions for managing multiple people at once.</p>
-                                 <div class="action-buttons">
-                     <button onclick="exportCSV()" class="btn-success">Export Current Data</button>
-                     <button onclick="resetAllStatus()" class="btn-danger">Reset All Status</button>
-                     <button onclick="pushToGitHub()" class="btn-warning">🚀 Push to GitHub</button>
-                 </div>
-            </div>
-        </div>
     </div>
 
     <script src='people_data.js'></script>
     <script>
         let currentUser = {};
-        let deletedPeople = [];
         let allPeople = [];
-        let filteredPeople = [];
-        let currentFilter = 'all';
-        let currentPage = 1;
-        const itemsPerPage = 50; // Show 50 people at a time instead of all
-        let searchTimeout = null;
 
         // Add error handling and debugging
         window.onerror = function(msg, url, lineNo, columnNo, error) {
@@ -383,10 +176,7 @@
                 alert('Error: People data not loaded. Please check if people_data.js exists.');
             } else {
                 allPeople = people;
-                filteredPeople = [...allPeople];
                 console.log('People data loaded successfully:', allPeople.length, 'people');
-                updateAdminStats();
-                displayAdminPeople();
             }
         });
 
@@ -425,7 +215,7 @@
         function loadFilteredData() {
             try {
                 // Create filtered list for email generator
-                const availablePeople = allPeople.filter(isPersonAvailable);
+                const availablePeople = allPeople.filter(p => !p['Status'] || p['Status'].trim() === '');
                 
                 // Update the global people array reference
                 window.availablePeople = availablePeople;
@@ -487,56 +277,10 @@
             }
         }
 
-        function deleteSelectedPerson() {
-            const selectedName = document.getElementById('personSelect').value;
-            if (!selectedName) {
-                alert('Please select a person to delete.');
-                return;
-            }
-            
-            if (confirm(`Are you sure you want to mark ${selectedName} as "Reachout Sent"?`)) {
-                const personToDelete = allPeople.find(p => p['Full Name'] === selectedName);
-                if (personToDelete) {
-                    // Mark as "Reachout Sent"
-                    personToDelete['Status'] = 'Reachout Sent';
-                    
-                    // Add to deleted people array for undo
-                    deletedPeople.push(personToDelete);
-                    
-                    // Reload filtered data
-                    loadFilteredData();
-                    
-                    // Show push to GitHub option
-                    if (confirm(`✅ Marked ${selectedName} as contacted\n\nWould you like to push this change to GitHub now?`)) {
-                        pushToGitHub();
-                    }
-                }
-            }
-        }
-
-        function undoLastDelete() {
-            if (deletedPeople.length === 0) {
-                alert('No deleted people to restore.');
-                return;
-            }
-            
-            const personToRestore = deletedPeople.pop();
-            
-            // Clear status in the main data
-            const person = allPeople.find(p => p['Full Name'] === personToRestore['Full Name']);
-            if (person) {
-                person['Status'] = '';
-            }
-            
-            // Reload filtered data
-            loadFilteredData();
-            
-            alert(`${personToRestore['Full Name']} has been restored. Remember to commit and push the updated CSV to GitHub!`);
-        }
-
         function backToStep1() {
             document.getElementById('person-selection').classList.add('hidden');
             document.getElementById('user-form').classList.remove('hidden');
+            document.getElementById('person-details').classList.add('hidden');
         }
 
         function generatePrompt() {
@@ -569,7 +313,7 @@ Google Search URL: ${person['Google Search Query']}${notesSection}
 
 Using this information and any additional context you can provide, generate a personalized cold email using the following template (fill in the brackets with the appropriate information):
 
-My name is ${currentUser.yourName}, and I'm a ${currentUser.yourYear} at ${collegeStr}, reaching out on behalf of a passionate team of 20+ students working to launch UNC's first student-run federal credit union. Inspired by successful models like Georgetown University's student credit union, our initiative aims to empower students through practical financial literacy, affordable banking services, and meaningful hands-on experience.
+My name is ${currentUser.yourName}, and I'm a ${currentUser.yourYear} at ${collegeStr}, reaching out on behalf of a passionate team of 20+ students working to launch a UNC student-run credit union. Inspired by successful other student credit unions, our initiative aims to empower students through practical financial literacy, affordable banking services, and meaningful hands-on experience.
 
 To turn our vision into reality, we're currently raising an initial $100,000 to cover regulatory and setup costs. We're seeking donations from alumni or others who share our commitment to financial empowerment, education, and community impact. Your support would help us provide:
 
@@ -578,13 +322,18 @@ To turn our vision into reality, we're currently raising an initial $100,000 to 
 - On-campus financial literacy education
 - Leadership and professional growth opportunities for UNC students
 
-We believe your support could provide substantial mutual benefits, including prominent brand visibility and recognition as a foundational supporter of UNC student success.
+We believe your support could provide substantial mutual benefits, including prominent brand visibility and recognition as a foundational supporter of UNC student success.Below are links to our tax-deductible donation link or the GoFundMe alternative to provide your support:
+
+Tax-Deductible De Novo Donation: https://secure.givelively.org/donate/cu-de-novo-collective/shiva-rajbhandari
+GoFundMe Alternative: https://www.gofundme.com/f/support-carolina-credit-union-for-unc-students
 
 Thank you for considering this opportunity to shape the future of student finance at UNC. I look forward to hearing from you soon!
 
 Warm regards,
 ${currentUser.yourName}
-Carolina Credit Union Initiative`;
+Carolina Credit Union Initiative
+
+Make sure to also include that I got their contact information from the UFS Alumni Database`;
 
             document.getElementById('promptText').textContent = prompt;
             document.getElementById('person-selection').classList.add('hidden');
@@ -607,312 +356,32 @@ Carolina Credit Union Initiative`;
             
             document.getElementById('personSelect').value = '';
             document.getElementById('googleNotes').value = '';
+            document.getElementById('person-details').classList.add('hidden');
         }
 
-        // Tab switching function
-        function switchTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Remove active class from all tab buttons
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
-            
-            // Show selected tab content
-            document.getElementById(tabName).classList.add('active');
-            
-            // Add active class to clicked button
-            event.target.classList.add('active');
-        }
+        function showPersonDetails() {
+            const selectedName = document.getElementById('personSelect').value;
+            const personDetailsDiv = document.getElementById('person-details');
+            const googleQueryLink = document.getElementById('google-query-link');
 
-        // Helper function to check if person is available
-        function isPersonAvailable(person) {
-            return !person['Status'] || person['Status'].trim() === '';
-        }
-
-        // Helper function to check if person is contacted
-        function isPersonContacted(person) {
-            return person['Status'] && person['Status'].trim() === 'Reachout Sent';
-        }
-
-        // Admin Panel Functions
-        function updateAdminStats() {
-            const total = allPeople.length;
-            const available = allPeople.filter(isPersonAvailable).length;
-            const contacted = total - available;
-
-            document.getElementById('total-people').textContent = total;
-            document.getElementById('available-people').textContent = available;
-            document.getElementById('contacted-people').textContent = contacted;
-            document.getElementById('sync-status').textContent = 'Ready';
-        }
-
-        function displayAdminPeople() {
-            const container = document.getElementById('admin-person-list');
-            container.innerHTML = '<div class="loading">Loading...</div>';
-
-            // Use setTimeout to prevent blocking the UI
-            setTimeout(() => {
-                container.innerHTML = '';
-                
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-                const pageData = filteredPeople.slice(startIndex, endIndex);
-
-                if (pageData.length === 0) {
-                    container.innerHTML = '<div class="loading">No people found</div>';
-                    return;
-                }
-
-                pageData.forEach(person => {
-                    const isContacted = isPersonContacted(person);
-                    const statusClass = isContacted ? 'status-contacted' : 'status-available';
-                    const statusText = isContacted ? 'Contacted' : 'Available';
-
-                    const personDiv = document.createElement('div');
-                    personDiv.className = 'person-item';
-                    personDiv.innerHTML = `
-                        <div class="person-info">
-                            <div class="person-name">${person['Full Name']}</div>
-                            <div class="person-details">${person['Job Title']} at ${person['Employer']}</div>
-                        </div>
-                        <div class="action-buttons">
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                            ${isContacted ? 
-                                `<button onclick="markAvailable('${person['Full Name']}')" class="btn-success">Mark Available</button>` :
-                                `<button onclick="markContacted('${person['Full Name']}')" class="btn-danger">Mark Contacted</button>`
-                            }
-                        </div>
-                    `;
-                    container.appendChild(personDiv);
-                });
-
-                updatePagination();
-            }, 10); // Small delay to prevent UI blocking
-        }
-
-        function filterPeople(filter) {
-            currentFilter = filter;
-            currentPage = 1; // Reset to first page
-            
-            // Update active tab
-            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Filter people
-            switch(filter) {
-                case 'available':
-                    filteredPeople = allPeople.filter(isPersonAvailable);
-                    break;
-                case 'contacted':
-                    filteredPeople = allPeople.filter(isPersonContacted);
-                    break;
-                default:
-                    filteredPeople = [...allPeople];
+            if (!selectedName) {
+                personDetailsDiv.classList.add('hidden');
+                googleQueryLink.href = '';
+                googleQueryLink.textContent = 'Click here to open Google search';
+                return;
             }
 
-            displayAdminPeople();
-        }
-
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredPeople.length / itemsPerPage);
-            const paginationContainer = document.getElementById('admin-pagination');
-            
-            if (!paginationContainer) return;
-            
-            paginationContainer.innerHTML = '';
-
-            if (totalPages <= 1) return;
-
-            // Previous button
-            if (currentPage > 1) {
-                const prevBtn = document.createElement('button');
-                prevBtn.textContent = '← Previous';
-                prevBtn.className = 'btn-warning';
-                prevBtn.onclick = () => {
-                    currentPage--;
-                    displayAdminPeople();
-                };
-                paginationContainer.appendChild(prevBtn);
-            }
-
-            // Page info
-            const pageInfo = document.createElement('span');
-            pageInfo.textContent = `Page ${currentPage} of ${totalPages} (${filteredPeople.length} total)`;
-            pageInfo.style.margin = '0 15px';
-            paginationContainer.appendChild(pageInfo);
-
-            // Next button
-            if (currentPage < totalPages) {
-                const nextBtn = document.createElement('button');
-                nextBtn.textContent = 'Next →';
-                nextBtn.className = 'btn-warning';
-                nextBtn.onclick = () => {
-                    currentPage++;
-                    displayAdminPeople();
-                };
-                paginationContainer.appendChild(nextBtn);
-            }
-        }
-
-        // Search functionality for admin panel
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchBox = document.getElementById('admin-search-box');
-            if (searchBox) {
-                searchBox.addEventListener('input', function(e) {
-                    // Clear previous timeout
-                    if (searchTimeout) {
-                        clearTimeout(searchTimeout);
-                    }
-                    
-                    // Debounce search to reduce performance impact
-                    searchTimeout = setTimeout(() => {
-                        const searchTerm = e.target.value.toLowerCase();
-                        currentPage = 1; // Reset to first page
-                        
-                        let searchResults = allPeople;
-                        if (currentFilter === 'available') {
-                            searchResults = allPeople.filter(isPersonAvailable);
-                        } else if (currentFilter === 'contacted') {
-                            searchResults = allPeople.filter(isPersonContacted);
-                        }
-
-                        filteredPeople = searchResults.filter(person => 
-                            person['Full Name'].toLowerCase().includes(searchTerm) ||
-                            person['Job Title'].toLowerCase().includes(searchTerm) ||
-                            person['Employer'].toLowerCase().includes(searchTerm)
-                        );
-
-                        displayAdminPeople();
-                    }, 300); // Wait 300ms after user stops typing
-                });
-            }
-        });
-
-                 function markContacted(name) {
-             const person = allPeople.find(p => p['Full Name'] === name);
-             if (person) {
-                 person['Status'] = 'Reachout Sent';
-                 updateAdminStats();
-                 // Only refresh if the person is on the current page
-                 if (filteredPeople.some(p => p['Full Name'] === name)) {
-                     displayAdminPeople();
-                 }
-                 
-                 // Show push to GitHub option
-                 if (confirm(`✅ Marked ${name} as contacted\n\nWould you like to push this change to GitHub now?`)) {
-                     pushToGitHub();
-                 }
-             }
-         }
-
-        function markAvailable(name) {
-            const person = allPeople.find(p => p['Full Name'] === name);
+            const person = allPeople.find(p => p['Full Name'] === selectedName);
             if (person) {
-                person['Status'] = '';
-                updateAdminStats();
-                // Only refresh if the person is on the current page
-                if (filteredPeople.some(p => p['Full Name'] === name)) {
-                    displayAdminPeople();
-                }
-                alert(`✅ Marked ${name} as available`);
+                personDetailsDiv.classList.remove('hidden');
+                googleQueryLink.href = person['Google Search Query'];
+                googleQueryLink.textContent = person['Google Search Query'];
+            } else {
+                personDetailsDiv.classList.add('hidden');
+                googleQueryLink.href = '';
+                googleQueryLink.textContent = 'Click here to open Google search';
             }
         }
-
-                 function exportCSV() {
-             // Show loading message
-             alert('🔄 Generating CSV export... This may take a moment for large datasets.');
-             
-             // Use setTimeout to prevent UI blocking
-             setTimeout(() => {
-                 let csvContent = 'Class Year,Employer,Employer City,Employer State,Employer Country,Type,Job Title,Full Name,Post-Graduation Email Address,Google Search Query,Reachout Notes,Status\n';
-                 
-                 allPeople.forEach(person => {
-                     csvContent += `2013,${person['Employer']},City,State,USA,Full-Time,${person['Job Title']},${person['Full Name']},email@example.com,${person['Google Search Query']},,${person['Status'] || ''}\n`;
-                 });
-
-                 const blob = new Blob([csvContent], { type: 'text/csv' });
-                 const url = window.URL.createObjectURL(blob);
-                 const a = document.createElement('a');
-                 a.href = url;
-                 a.download = 'alumni_data_export.csv';
-                 a.click();
-                 window.URL.revokeObjectURL(url);
-
-                 alert('✅ CSV exported successfully');
-             }, 50);
-         }
-
-                 function resetAllStatus() {
-             if (confirm('Are you sure you want to reset all statuses? This will mark everyone as available.')) {
-                 // Use setTimeout to prevent UI blocking
-                 setTimeout(() => {
-                     allPeople.forEach(person => {
-                         person['Status'] = '';
-                     });
-                     updateAdminStats();
-                     displayAdminPeople();
-                     alert('✅ Reset all statuses');
-                 }, 10);
-             }
-         }
-
-         async function pushToGitHub() {
-             try {
-                 // Show loading message
-                 alert('🔄 Preparing to push changes to GitHub...\n\nThis will update the CSV and push to GitHub automatically.');
-                 
-                 // Check if API server is available
-                 const response = await fetch('/api/update_csv', {
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/json' },
-                     body: JSON.stringify({ people: allPeople })
-                 });
-                 
-                 if (response.ok) {
-                     // Try to sync to GitHub
-                     const syncResponse = await fetch('/api/sync_to_github', {
-                         method: 'POST',
-                         headers: { 'Content-Type': 'application/json' }
-                     });
-                     
-                     if (syncResponse.ok) {
-                         const result = await syncResponse.json();
-                         if (result.success) {
-                             alert('✅ Successfully pushed changes to GitHub!\n\nThe CSV has been updated and synced to your repository.');
-                         } else {
-                             throw new Error(result.error || 'GitHub sync failed');
-                         }
-                     } else {
-                         throw new Error('Failed to sync to GitHub');
-                     }
-                 } else {
-                     throw new Error('Failed to update CSV');
-                 }
-             } catch (error) {
-                 console.error('Push to GitHub error:', error);
-                 
-                 // Fallback: Download the updated CSV
-                 alert('⚠️ API server not available. Downloading updated CSV file instead.\n\nPlease manually update your CSV file and push to GitHub.');
-                 
-                 let csvContent = 'Class Year,Employer,Employer City,Employer State,Employer Country,Type,Job Title,Full Name,Post-Graduation Email Address,Google Search Query,Reachout Notes,Status\n';
-                 
-                 allPeople.forEach(person => {
-                     csvContent += `2013,${person['Employer']},City,State,USA,Full-Time,${person['Job Title']},${person['Full Name']},email@example.com,${person['Google Search Query']},,${person['Status'] || ''}\n`;
-                 });
-
-                 const blob = new Blob([csvContent], { type: 'text/csv' });
-                 const url = window.URL.createObjectURL(blob);
-                 const a = document.createElement('a');
-                 a.href = url;
-                 a.download = 'Email Project with Data for Alumni Database - Job & Internship Acceptances (1).csv';
-                 a.click();
-                 window.URL.revokeObjectURL(url);
-             }
-         }
     </script>
 </body>
 </html> 
