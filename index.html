@@ -92,6 +92,91 @@
             text-decoration: underline;
             color: #0056b3;
         }
+
+        /* Searchable Dropdown Styles */
+        .searchable-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .searchable-dropdown input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .searchable-dropdown input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .dropdown-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-results.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item.selected {
+            background-color: #e3f2fd;
+            border-left: 4px solid #007bff;
+        }
+
+        .dropdown-item .person-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .dropdown-item .person-details {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .dropdown-item .highlight {
+            background-color: #fff3cd;
+            padding: 1px 2px;
+            border-radius: 2px;
+        }
+
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -123,10 +208,12 @@
             <div class="sync-status" id="sync-status">Loading data...</div>
             
             <div class="form-group">
-                <label for="personSelect">Select Person:</label>
-                <select id="personSelect" required onchange="showPersonDetails()">
-                    <option value="">Choose a person...</option>
-                </select>
+                <label for="personSearch">Search and Select Person:</label>
+                <div class="searchable-dropdown">
+                    <input type="text" id="personSearch" placeholder="Type to search by name, job title, or employer..." oninput="filterPeople()">
+                    <div class="dropdown-results" id="dropdownResults"></div>
+                    <input type="hidden" id="personSelect" required>
+                </div>
             </div>
             
             <div id="person-details" class="hidden">
@@ -232,27 +319,122 @@
 
         function updateDropdown() {
             try {
-                const select = document.getElementById('personSelect');
-                if (!select) {
-                    throw new Error('Person select element not found');
+                // Clear the search input
+                const searchInput = document.getElementById('personSearch');
+                if (searchInput) {
+                    searchInput.value = '';
                 }
                 
-                select.innerHTML = '<option value="">Choose a person...</option>';
+                // Clear the hidden input
+                const hiddenInput = document.getElementById('personSelect');
+                if (hiddenInput) {
+                    hiddenInput.value = '';
+                }
                 
-                // Use the filtered available people
-                const availablePeople = window.availablePeople || [];
+                // Hide dropdown results
+                const dropdownResults = document.getElementById('dropdownResults');
+                if (dropdownResults) {
+                    dropdownResults.classList.remove('show');
+                }
                 
-                availablePeople.forEach(person => {
-                    const option = document.createElement('option');
-                    option.value = person['Full Name'];
-                    option.textContent = `${person['Full Name']} - ${person['Job Title']} at ${person['Employer']}`;
-                    select.appendChild(option);
-                });
-                
-                console.log('Dropdown updated with', availablePeople.length, 'people');
+                console.log('Dropdown updated and cleared');
             } catch (error) {
                 console.error('Error in updateDropdown:', error);
                 alert('Error updating dropdown: ' + error.message);
+            }
+        }
+
+        function filterPeople() {
+            try {
+                const searchTerm = document.getElementById('personSearch').value.toLowerCase().trim();
+                const dropdownResults = document.getElementById('dropdownResults');
+                const availablePeople = window.availablePeople || [];
+                
+                if (!searchTerm) {
+                    dropdownResults.classList.remove('show');
+                    return;
+                }
+                
+                // Filter people based on search term
+                const filteredPeople = availablePeople.filter(person => {
+                    const name = (person['Full Name'] || '').toLowerCase();
+                    const jobTitle = (person['Job Title'] || '').toLowerCase();
+                    const employer = (person['Employer'] || '').toLowerCase();
+                    
+                    return name.includes(searchTerm) || 
+                           jobTitle.includes(searchTerm) || 
+                           employer.includes(searchTerm);
+                });
+                
+                // Display results
+                displaySearchResults(filteredPeople, searchTerm);
+                
+            } catch (error) {
+                console.error('Error in filterPeople:', error);
+            }
+        }
+
+        function displaySearchResults(people, searchTerm) {
+            try {
+                const dropdownResults = document.getElementById('dropdownResults');
+                
+                if (people.length === 0) {
+                    dropdownResults.innerHTML = '<div class="no-results">No people found matching your search</div>';
+                    dropdownResults.classList.add('show');
+                    return;
+                }
+                
+                let html = '';
+                people.forEach(person => {
+                    const name = person['Full Name'] || '';
+                    const jobTitle = person['Job Title'] || '';
+                    const employer = person['Employer'] || '';
+                    
+                    // Highlight matching text
+                    const highlightedName = highlightText(name, searchTerm);
+                    const highlightedJobTitle = highlightText(jobTitle, searchTerm);
+                    const highlightedEmployer = highlightText(employer, searchTerm);
+                    
+                    html += `
+                        <div class="dropdown-item" onclick="selectPerson('${name.replace(/'/g, "\\'")}')">
+                            <div class="person-name">${highlightedName}</div>
+                            <div class="person-details">${highlightedJobTitle} at ${highlightedEmployer}</div>
+                        </div>
+                    `;
+                });
+                
+                dropdownResults.innerHTML = html;
+                dropdownResults.classList.add('show');
+                
+            } catch (error) {
+                console.error('Error in displaySearchResults:', error);
+            }
+        }
+
+        function highlightText(text, searchTerm) {
+            if (!searchTerm || !text) return text;
+            
+            const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function selectPerson(personName) {
+            try {
+                // Set the hidden input value
+                document.getElementById('personSelect').value = personName;
+                
+                // Set the search input to show selected person
+                document.getElementById('personSearch').value = personName;
+                
+                // Hide dropdown results
+                document.getElementById('dropdownResults').classList.remove('show');
+                
+                // Show person details
+                showPersonDetails();
+                
+                console.log('Person selected:', personName);
+            } catch (error) {
+                console.error('Error in selectPerson:', error);
             }
         }
 
@@ -382,6 +564,23 @@ Make sure to also include that I got their contact information from the UFS Alum
                 googleQueryLink.textContent = 'Click here to open Google search';
             }
         }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.searchable-dropdown');
+            const dropdownResults = document.getElementById('dropdownResults');
+            
+            if (dropdown && !dropdown.contains(event.target)) {
+                dropdownResults.classList.remove('show');
+            }
+        });
+
+        // Handle keyboard navigation
+        document.getElementById('personSearch').addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.getElementById('dropdownResults').classList.remove('show');
+            }
+        });
     </script>
 </body>
 </html> 
